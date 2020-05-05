@@ -13,14 +13,38 @@ set( JMSD_THIS_PROJECT_SOURCE_ROOT ${JMSD_COMPONENT_SOURCE_ROOT_PATH} )
 set( ${PROJECT_NAME}_DEPENDENCY_DIRS_VAR
 	${JMSD_PLATFORM_SOURCES}
 	${JMSD_THIS_PROJECT_SOURCE_ROOT} )
+
 list( REMOVE_DUPLICATES ${PROJECT_NAME}_DEPENDENCY_DIRS_VAR )
-include_directories( ${${PROJECT_NAME}_DEPENDENCY_DIRS_VAR} )
+
+include_directories(
+	${${PROJECT_NAME}_DEPENDENCY_DIRS_VAR}
+	${JMSD_COMPONENT_SOURCE_ROOT_PATH}/jmsd_adhocs/common )
+
+if( UNIX )
+	include_directories( ${JMSD_COMPONENT_SOURCE_ROOT_PATH}/jmsd_adhocs/linux )
+elseif ( WIN32 )
+	include_directories( ${JMSD_COMPONENT_SOURCE_ROOT_PATH}/jmsd_adhocs/windows )
+endif()
 
 
 ## this project headers and sources enumeration section
 file( GLOB header_and_source_files
 	${JMSD_THIS_PROJECT_SOURCE_ROOT}/*.h*
-	${JMSD_THIS_PROJECT_SOURCE_ROOT}/*.c* )
+	${JMSD_THIS_PROJECT_SOURCE_ROOT}/*.c*
+	${JMSD_THIS_PROJECT_SOURCE_ROOT}/jmsd_adhocs/common/*.h*
+	${JMSD_THIS_PROJECT_SOURCE_ROOT}/jmsd_adhocs/common/*.c* )
+
+if( UNIX )
+	file( GLOB_RECURSE platform_header_and_source_files
+		${JMSD_THIS_PROJECT_SOURCE_ROOT}/jmsd_adhocs/linux/*.h*
+		${JMSD_THIS_PROJECT_SOURCE_ROOT}/jmsd_adhocs/linux/*.c* )
+elseif ( WIN32 )
+	file( GLOB_RECURSE platform_header_and_source_files
+		${JMSD_THIS_PROJECT_SOURCE_ROOT}/jmsd_adhocs/windows/*.h*
+		${JMSD_THIS_PROJECT_SOURCE_ROOT}/jmsd_adhocs/windows/*.c* )
+endif()
+
+list( APPEND header_and_source_files ${platform_header_and_source_files} )
 
 add_library( ${PROJECT_NAME} SHARED ${header_and_source_files} )
 
